@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option java_package = "test";
+
+service Simple {
+  rpc firstRequest (SimpleMessage) returns (SimpleMessage) {}
+}
+
+message SimpleMessage {
+  string text = 1;
+}
