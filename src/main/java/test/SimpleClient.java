@@ -1,6 +1,7 @@
 package test;
 
 import io.grpc.*;
+import test.interceptor.SimpleClientInterceptor;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -10,7 +11,7 @@ public class SimpleClient {
     private final SimpleGrpc.SimpleBlockingStub blockingStub;
 
     public SimpleClient(Channel channel) {
-        blockingStub = SimpleGrpc.newBlockingStub(channel);
+        blockingStub = SimpleGrpc.newBlockingStub(channel).withInterceptors(new SimpleClientInterceptor());
     }
 
     public void exchangeMessage(String message) throws StatusRuntimeException {
@@ -23,16 +24,13 @@ public class SimpleClient {
     public static void main(String[] args) throws Exception {
         //standard ca route
         File ca = new File("C:\\Users\\KwS\\repos\\grpc-key-management\\ssl\\ca.crt");
-        //preshared key
-        File certChain = new File("C:\\Users\\KwS\\repos\\grpc-key-management\\ssl\\server.crt");
         TlsChannelCredentials.Builder tlsBuilder = TlsChannelCredentials.newBuilder()
-                .trustManager(ca)
-                .keyManager();
+                .trustManager(ca);
         ManagedChannel channel = Grpc.newChannelBuilderForAddress("localhost", 9001, tlsBuilder.build())
                 .build();
         SimpleClient client = new SimpleClient(channel);
         long start = System.currentTimeMillis();
-        int N = 100000;
+        int N = 1;
         try {
             for (int i = 0; i < N; i++) {
                 client.exchangeMessage("message" + i);
