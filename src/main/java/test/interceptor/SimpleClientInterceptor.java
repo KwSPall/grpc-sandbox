@@ -2,13 +2,13 @@ package test.interceptor;
 
 import com.google.protobuf.MessageLite;
 import io.grpc.*;
-import io.grpc.stub.MetadataUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+//https://github.com/grpc/grpc-java/issues/4684
 public class SimpleClientInterceptor implements ClientInterceptor {
 
     private String getHmac(byte[] data, String key) throws NoSuchAlgorithmException, InvalidKeyException {
