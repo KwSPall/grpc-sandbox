@@ -2,6 +2,7 @@ package test;
 
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
+import test.interceptor.SimpleServerInterceptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,7 @@ public class SimpleServer {
 
         server = Grpc.newServerBuilderForPort(9001, serverCredentials)
                 .addService(new SimpleImpl())
+                .intercept(new SimpleServerInterceptor())
                 .build()
                 .start();
 
@@ -53,6 +55,7 @@ public class SimpleServer {
         @Override
         public void firstRequest(SimpleOuterClass.SimpleMessage req, StreamObserver<SimpleOuterClass.SimpleMessage> responseObserver) {
             SimpleOuterClass.SimpleMessage reply = SimpleOuterClass.SimpleMessage.newBuilder().setText(req.getText() + " mirrored from server").build();
+            System.out.println("pinged " + req.getText());
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
         }
