@@ -18,7 +18,7 @@ public class SimpleClient {
         SimpleOuterClass.SimpleMessage simpleMessageRequest = SimpleOuterClass.SimpleMessage.newBuilder().setText(message).build();
         SimpleOuterClass.SimpleMessage simpleMessageResponse;
         simpleMessageResponse = blockingStub.firstRequest(simpleMessageRequest);
-        //System.out.println(simpleMessageResponse.getText());
+        System.out.println(simpleMessageResponse.getText());
     }
 
     public static void main(String[] args) throws Exception {

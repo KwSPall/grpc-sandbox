@@ -30,10 +30,19 @@ public class SimpleClientInterceptor implements ClientInterceptor {
 
             private String token = "4444";
 
+            private boolean started = false;
+            private int messagesCount;
+
+            private Listener<RespT> responseListener;
+            private Metadata headers;
+
             @Override
             public void start(Listener <RespT> responseListener, Metadata headers) {
-                //put custom header
+                this.headers = headers;
+                this.responseListener = responseListener;
 
+                //put custom header
+                /*
                 Metadata headersWithHmac = new Metadata();
                 Metadata.Key<String> authorizationKey = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER);
                 headersWithHmac.put(authorizationKey, "Bearer " + token);
@@ -41,6 +50,7 @@ public class SimpleClientInterceptor implements ClientInterceptor {
                 headers.merge(headersWithHmac);
 
                 super.start(responseListener, headers);
+                */
             }
 
             @Override
@@ -53,9 +63,28 @@ public class SimpleClientInterceptor implements ClientInterceptor {
                     System.out.println(token);
                 } catch (Exception e) {
                     System.out.println("failed to calculate hmac");
+                    //fail message?
+                }
+
+                Metadata.Key<String> authorizationKey = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER);
+                headers.put(authorizationKey, "Bearer " + token);
+
+                super.start(responseListener, headers);
+                if (!started) {
+                    super.request(messagesCount);
+                    started = true;
                 }
 
                 super.sendMessage(message);
+            }
+
+            @Override
+            public void request(int numMessages) {
+                if (started) {
+                    super.request(numMessages);
+                } else {
+                    this.messagesCount = numMessages;
+                }
             }
 
         };
